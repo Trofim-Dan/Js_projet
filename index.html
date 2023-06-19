@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring de conduite accompagnée</title>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("submitButton").addEventListener("click", function (event) {
+        event.preventDefault();
+  
+        const name = document.getElementById('fullname');
+        const email = document.getElementById('email');
+        const departureTime = document.getElementById('form-departure-time');
+        const arrivalTime = document.getElementById('form-arrival-time');
+        const distance = document.getElementById('distance');
+        const meteo = document.getElementById('meteo');
+        const trafic = document.getElementById('trafic');
+  
+        const data = {
+          name: name.value,
+          email: email.value,
+          departureTime: new Date(departureTime.value),
+          arrivalTime: new Date(arrivalTime.value),
+          distance: distance.value,
+          meteo: meteo.value,
+          trafic: trafic.value
+        };
+  
+        if (name.value.length < 2 || name.value.length > 20) {
+          alert('Le nom doit être plus grand que 2 lettres et moins que 20 lettres');
+          return;
+        }
+  
+        const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  
+        if (!email.value.match(validRegex)) {
+          alert('Adresse e-mail invalide !');
+          return;
+        }
+  
+        if (distance.value < 0 || !distance.value.length) {
+          alert('Valeur de distance invalide');
+          return;
+        }
+        
+  
+        const urlSearchParams = new URLSearchParams();
+        urlSearchParams.set('name', encodeURIComponent(data.name));
+        urlSearchParams.set('email', encodeURIComponent(data.email));
+        urlSearchParams.set('departureTime', encodeURIComponent(data.departureTime.toISOString()));
+        urlSearchParams.set('arrivalTime', encodeURIComponent(data.arrivalTime.toISOString()));
+        urlSearchParams.set('distance', encodeURIComponent(data.distance));
+        urlSearchParams.set('meteo', encodeURIComponent(data.meteo));
+        urlSearchParams.set('trafic', encodeURIComponent(data.trafic));
+  
+        if (!localStorage.getItem("user-info")) {
+          localStorage.setItem("user-info", JSON.stringify([data]));
+        } else {
+          localStorage.setItem("user-info", JSON.stringify([...JSON.parse(localStorage.getItem("user-info")), data]));
+        }
+        
+        const url = `main.html?${urlSearchParams.toString()}`;
+        window.location.href = url;
+      });
+    });
+  </script>
+
+  
+  <style>
+    body, input, button {
+      font-family: Verdana;
+      font-size: 1em;
+     
+    }
+  
+    .title {
+      display: flex;
+      justify-content: center;
+      margin: 2rem;
+      color: #ffffff;
+    }
+   
+    form {
+      margin: 0;
+      padding: 0;
+    }
+
+    
+  
+    #mainForm {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+  
+    fieldset {
+      width: 400px;
+      border: 1px solid;
+      border-radius: 5px;
+      margin: 5px 10px;
+      line-height: 30px;
+      color: #4a738b;
+    }
+    fieldset:nth-of-type(1) legend {
+      color: #fff;
+      font-size: 1.2em;
+      font-weight: bold;
+      background-color: #7ebfeb;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    
+    fieldset:nth-of-type(2) legend {
+      color: #fff;
+      font-size: 1.2em;
+      font-weight: bold;
+      background-color: #7ebfeb;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+  
+    input {
+      all: unset;
+      background-color: #fff;
+      border: 1px solid #afafaf;
+      border-radius: 5px;
+      padding: 0.1rem 1rem;
+    }
+  
+    input[required]:valid {
+      border: 1px green solid;
+    }
+  
+    select {
+      background-color: #fff;
+      border: 1px solid #afafaf;
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+    }
+  
+    button {
+      all: unset;
+      color: #ffffff;
+      display: flex;
+      justify-content: end;
+      background-color: rgb(35, 112, 251);
+      width: fit-content;
+      border-radius: 25px;
+      padding: 5px 10px;
+      margin: 1rem auto;
+      cursor: pointer;
+    }
+    .table-container {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      overflow-x: auto;
+    }
+    .personal-information {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+  }
+  
+  p {
+      display: flex;
+      flex-direction: column;
+      margin: 5px 0;
+  }
+  
+  canvas {
+      border: 1px solid;
+      border-radius: 25px;
+  }
+  
+  #chartContainer {
+      position: relative;
+      margin: auto;
+      height: 50vh;
+      width: 65vw;
+  }
+  .link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    
+  }
+
+  .link:hover {
+    background-color: #2980b9;
+  }
+  .footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #2980b9;
+    padding: 10px;
+    font-size: 0.5em;
+    text-align: center;
+  }
+  .footer p {
+    margin:2px 0;
+  }
+  @media (max-width: 768px) {
+    .title {
+        display: flex;
+        justify-content: center;
+    }
+
+    #mainForm {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    fieldset {
+        width: 300px;
+    }
+    
+  }
+ 
+  </style>
+</head>
+<body style="background-color: #020410;">
+  
+  <a href="main.html" class="link">Go to Monitoring</a>
+  <form id="quiz-form" action="main.html" method="post"></form>
+<h1 class="title">Monitoring de conduite accompagnée</h1>
+<form id="mainForm" method="post">
+  <fieldset>
+    <legend>Informations personnelles</legend>
+    <div class="personal-information">
+      <p>
+        <label for="fullname">Nom complet :</label>
+        <input
+          type="text"
+          id="fullname"
+          name="fullname"
+          placeholder="Entrez votre nom complet"
+          minlength="2"
+          maxlength="20"
+          required
+        >
+      </p>
+      <p>
+         <label for="email"> Adresse électronique :</label> 
+        <input
+          type="email" 
+          id="email"
+          name="email"
+          placeholder="Entrez votre adresse électronique"
+          required
+        >
+      </p>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Information supplémentaire</legend>
+    <p>
+      <label for="form-departure-time">Heure de départ :</label>
+      <input
+        type="datetime-local"
+        id="form-departure-time"
+        name="form-date"
+        required
+      >
+    </p>
+    <p>
+      <label for="form-arrival-time">Heure d'arrivée :</label>
+      <input
+        type="datetime-local"
+        id="form-arrival-time"
+        name="form-arrival-time"
+        required
+      >
+    </p>
+    <p>
+      <label for="distance">Distance :</label>
+      <input
+        type="number"
+        id="distance"
+        name="distance"
+        placeholder="km"
+        min="1"
+        max="3000"
+        required 
+      >
+    </p>
+    
+    <p>
+      <label for="meteo">Meteo :</label>
+      <select id="meteo">
+        <option>Clair</option>
+        <option>Partiellement nuageux</option>
+        <option>Nuageux</option>
+        <option>Pluvieux</option>
+        <option>Brumeux</option>
+      </select>
+    </p>
+    <p>
+      <label for="expérience">Trafic :</label>
+      <select id="trafic">
+        <option>Route cassée</option>
+        <option>Route en construction</option>
+        <option>Trafic fluide</option>
+        <option>Les accidents</option>
+      </select>
+    </p>
+    
+    <p> 
+      <button id="submitButton">Envoyer</button>
+    </p>
+  </fieldset>
+</form>
+
+</div>
+<div class="footer">
+  <h2>Trofim Dan</h2>
+  <p>Licence en Informatique L1S1</p>
+  <p> Copyright &copy; 2023 Trofim Dan</p>
+</div>
+</body>
+
+
+  </html> 
